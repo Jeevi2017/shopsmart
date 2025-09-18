@@ -1,0 +1,243 @@
+<div class="container mt-4">
+  <div class="card shadow-sm rounded-3">
+    <div class="card-header bg-primary text-white py-3">
+      <h3 class="mb-0">Cart Items</h3>
+    </div>
+    <div class="card-body p-4">
+      <div *ngIf="loadingCart" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading Your Cart...</span>
+        </div>
+        <p class="mt-2">Loading your shopping cart Items..</p>
+      </div>
+
+      <div
+        *ngIf="cartError"
+        class="alert alert-danger alert-dismissible fade show"
+        role="alert"
+      >
+        {{ cartError }}
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="alert"
+          aria-label="Close"
+          (click)="cartError = null"
+        ></button>
+      </div>
+
+      <!-- Success Message Display for Coupons or other actions -->
+      <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ successMessage }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" (click)="successMessage = null"></button>
+      </div>
+
+      <div *ngIf="!loadingCart && !cartError">
+        <div
+          *ngIf="
+            cart && cart.cartItems && cart.cartItems.length > 0;
+            else emptyCart
+          "
+        >
+          <div class="table-responsive">
+            <table class="table table-hover align-middle">
+              <thead>
+                <tr>
+                  <th scope="col">Product</th>
+                  <th scope="col">Price</th>
+                  <th scope="col">Quantity</th>
+                  <th scope="col">Subtotal</th>
+                  <th scope="col">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of cart.cartItems">
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <img
+                        [src]="
+                          item.productDetails.images[0] ||
+                          'https://placehold.co/50x50/CCCCCC/333333?text=No+Img'
+                        "
+                        alt="{{ item.productDetails.name }}"
+                        class="img-thumbnail me-3"
+                        style="width: 50px; height: 50px; object-fit: cover"
+                      />
+                      <span class="fw-bold">{{
+                        item.productDetails.name
+                      }}</span>
+                    </div>
+                  </td>
+                  <td>Rs.{{ item.price | number : "1.2-2" }}</td>
+                  <td>
+                    <!-- START OF QUANTITY INPUT GROUP -->
+                    <div class="input-group input-group-sm" style="width: 120px;">
+                      <button class="btn btn-outline-secondary" type="button" (click)="updateItemQuantity(item.productDetails.id, item.quantity - 1, item.quantity)">-</button>
+                      <input
+                        type="number"
+                        [ngModel]="item.quantity"
+                        (change)="onQuantityChange(item, $event)"
+                        min="1"
+                        class="form-control form-control-sm text-center"
+                      />
+                      <button class="btn btn-outline-secondary" type="button" (click)="updateItemQuantity(item.productDetails.id, item.quantity + 1, item.quantity)">+</button>
+                    </div>
+                    <!-- END OF QUANTITY INPUT GROUP -->
+                  </td>
+                  <td>
+                    Rs.{{ item.quantity * item.price | number : "1.2-2" }}
+                  </td>
+                  <td>
+                    <button
+                      class="btn btn-outline-danger btn-sm"
+                      (click)="removeItem(item.productDetails.id)"
+                      [disabled]="submitting"
+                    >
+                      <i class="bi bi-trash"></i> Remove
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="row mt-4">
+            <div class="col-md-6">
+              <!-- Coupon Code Input Section -->
+              <div class="card shadow-sm mb-4">
+                <div class="card-header bg-dark text-white py-2">
+                  <h5 class="mb-0">Apply Coupon Code</h5>
+                </div>
+                <div class="card-body">
+                  <div class="input-group mb-3">
+                    <input type="text" class="form-control" placeholder="Enter coupon code" [(ngModel)]="couponCode" name="couponCode">
+                    <button class="btn btn-primary" type="button" (click)="applyCoupon()" [disabled]="submitting || !couponCode.trim()">
+                      <span *ngIf="submitting" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                      Apply
+                    </button>
+                  </div>
+                  <div *ngIf="cart.couponCode" class="alert alert-info d-flex justify-content-between align-items-center mb-2">
+                    Coupon <strong>{{ cart.couponCode }}</strong> applied!
+                    <button class="btn btn-sm btn-outline-danger" (click)="removeCoupon()" [disabled]="submitting">Remove</button>
+                  </div>
+                  <div *ngIf="couponError" class="alert alert-danger mt-2">{{ couponError }}</div>
+                </div>
+              </div>
+
+              <!-- Available Coupons Section (NEW) -->
+              <div class="card shadow-sm">
+                <div class="card-header bg-info text-white py-2">
+                  <h5 class="mb-0">Available Coupons</h5>
+                </div>
+                <div class="card-body">
+                  <div *ngIf="loadingCoupons" class="text-center py-3">
+                    <div class="spinner-border text-info spinner-border-sm" role="status">
+                      <span class="visually-hidden">Loading coupons...</span>
+                    </div>
+                    <p class="mt-1 text-sm text-muted">Loading available coupons...</p>
+                  </div>
+                  <div *ngIf="couponsError" class="alert alert-danger">{{ couponsError }}</div>
+
+                  <div *ngIf="!loadingCoupons && !couponsError">
+                    <div *ngIf="availableCoupons.length > 0; else noAvailableCoupons">
+                      <ul class="list-group list-group-flush">
+                        <li *ngFor="let coupon of availableCoupons" class="list-group-item d-flex justify-content-between align-items-center">
+                          <div>
+                            <h6 class="mb-0">{{ coupon.code }}</h6>
+                            <small class="text-muted">
+                              <span *ngIf="coupon.type === 'PERCENTAGE'">{{ coupon.value }}% off</span>
+                              <span *ngIf="coupon.type === 'FIXED_AMOUNT'">Rs.{{ coupon.value | number : "1.2-2" }} off</span>
+                              <span *ngIf="coupon.minOrderAmount"> | Min. order: Rs.{{ coupon.minOrderAmount | number : "1.2-2" }}</span>
+                              <span *ngIf="coupon.endDate"> | Expires: {{ coupon.endDate | date:'shortDate' }}</span>
+                            </small>
+                          </div>
+                          <button
+                            class="btn btn-sm btn-success"
+                            (click)="applyCoupon(coupon.code)"
+                            [disabled]="submitting || cart.couponCode === coupon.code"
+                          >
+                            <span *ngIf="cart?.couponCode !== coupon.code">Apply</span>
+                            <span *ngIf="cart?.couponCode === coupon.code">Applied</span>
+                          </button>
+                        </li>
+                      </ul>
+                    </div>
+                    <ng-template #noAvailableCoupons>
+                      <p class="text-center text-muted py-3">No coupons currently available.</p>
+                    </ng-template>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white py-2">
+                  <h5 class="mb-0">Cart Summary</h5>
+                </div>
+                <div class="card-body">
+                  <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      Subtotal:
+                      <span>Rs.{{ getCartSubtotal() | number : "1.2-2" }}</span>
+                    </li>
+                    <li *ngIf="cart.discountAmount && cart.discountAmount > 0" class="list-group-item d-flex justify-content-between align-items-center text-success">
+                      Discount ({{ cart.couponCode }}):
+                      <span>-Rs.{{ cart.discountAmount | number : "1.2-2" }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center fw-bold">
+                      Total:
+                      <span>Rs.{{ cart.totalAmount | number : "1.2-2" }}</span>
+                    </li>
+                  </ul>
+                  <div class="d-grid gap-2 mt-3">
+                    <button
+                      class="btn btn-success btn-lg"
+                      (click)="checkout()"
+                      [disabled]="submitting || processingCheckout || cart.cartItems.length === 0"
+                    >
+                      <span
+                        *ngIf="processingCheckout"
+                        class="spinner-border spinner-border-sm me-2"
+                        role="status"
+                        aria-hidden="true"
+                      ></span>
+                      Proceed to Checkout
+                    </button>
+                    <button
+                      class="btn btn-outline-secondary"
+                      (click)="clearCart()"
+                      [disabled]="submitting || cart.cartItems.length === 0"
+                    >
+                      <span
+                        *ngIf="submitting"
+                        class="spinner-border spinner-border-sm me-2"
+                        role="status"
+                        aria-hidden="true"
+                      ></span>
+                      Clear Cart
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <ng-template #emptyCart>
+          <div class="alert alert-info text-center py-4" role="alert">
+            <h4 class="alert-heading">Your cart is empty!</h4>
+            <p>
+              Looks like you haven't added anything to your cart yet. Start
+              exploring our amazing products!
+            </p>
+            <hr />
+            <a routerLink="/products" class="btn btn-primary"
+              >Start Shopping</a
+            >
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,43 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  color: white;
+}
+.navlink{
+  color: white;
+}
+ 
+ 
+ /* Navbar background */
+.navbar.bg-dark {
+  background-color: #800020 !important; /* Burgundy */
+}
+
+/* Navbar links default color */
+.navbar .nav-link {
+  color: white; /* keep white text */
+  transition: color 0.3s;
+}
+
+/* Navbar links default style */
+.navbar .nav-link,
+.navbar .dropdown-item {
+  color: white;
+  position: relative;
+  transition: all 0.3s;
+  border-radius: 5px; /* Rounded corners for box */
+  padding: 5px 10px;  /* Space inside the box */
+}
+
+/* Hover effect: yellow background with burgundy text */
+.navbar .nav-link:hover,
+.navbar .dropdown-item:hover {
+  background-color: yellow;
+  color: #800020; /* burgundy text inside yellow box */
+}
+
+/* Optional: smooth transition */
+.navbar .nav-link,
+.navbar .dropdown-item {
+  transition: background-color 0.3s, color 0.3s;
+}

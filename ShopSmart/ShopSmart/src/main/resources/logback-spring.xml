@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+ 
+    <!-- Define a property for the log file path -->
+    <property name="LOG_FILE" value="logs/ecomm-app.log"/>
+ 
+    <!-- ===================================================================== -->
+    <!-- Console Appender -->
+    <!-- This appender sends log messages to the console (standard output) -->
+    <!-- ===================================================================== -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+ 
+    <!-- ===================================================================== -->
+    <!-- Rolling File Appender -->
+    <!-- This appender writes log messages to a file and manages file rotation -->
+    <!-- It creates a new file when the size limit is reached and archives the old one -->
+    <!-- ===================================================================== -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_FILE}</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- Log file name pattern: archives daily and with a number suffix if size is exceeded -->
+            <fileNamePattern>logs/ecomm-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <!-- Each file can grow up to 10MB -->
+            <maxFileSize>10MB</maxFileSize>
+            <!-- Keep a maximum of 30 days of archived log files -->
+            <maxHistory>30</maxHistory>
+            <!-- Total size of all archived logs should not exceed 1GB -->
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+ 
+    <!-- ===================================================================== -->
+    <!-- Logger Definitions -->
+    <!-- These define which packages log at which level -->
+    <!-- ===================================================================== -->
+ 
+    <!-- Define the root logger -->
+    <!-- This is the default logger for all classes in your application -->
+    <!-- It logs INFO level messages and higher and uses both the CONSOLE and FILE appenders -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </root>
+ 
+    <!-- Set a specific logger for the Kafka consumer to show DEBUG logs -->
+    <!-- This can be helpful for debugging a specific component without flooding the main logs -->
+    <logger name="com.example.Ecomm.serviceImpl.KafkaConsumerService" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </logger>
+ 
+    <!-- You can add more specific loggers as needed. Example: -->
+    <!-- <logger name="com.example.Ecomm.controller" level="DEBUG"/> -->
+ 
+</configuration>
+ 
+ 

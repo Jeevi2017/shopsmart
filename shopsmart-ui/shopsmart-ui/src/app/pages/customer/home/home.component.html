@@ -1,0 +1,105 @@
+<div class="d-flex flex-column min-vh-100">
+  <!-- Navbar for Authenticated Customer -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+    <div class="container-fluid">
+      <a class="navbar-brand text-primary fw-bold" routerLink="/home">
+        shopsmart
+      </a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
+        <!-- 🔍 Search bar -->
+        <form class="d-flex me-auto" (ngSubmit)="onSearch()">
+          <input
+            class="form-control me-2"
+            type="search"
+            placeholder="Search products..."
+            aria-label="Search"
+            [(ngModel)]="searchQuery"
+            name="search"
+          />
+          <button class="btn btn-outline-primary" type="submit">Search</button>
+        </form>
+
+        <!-- Right-side nav -->
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" routerLink="/home">
+              Dashboard
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/home/cart">My Cart</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/home/orders">My Orders</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a
+              class="nav-link dropdown-toggle"
+              href="#"
+              id="navbarDropdown"
+              role="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              Welcome, {{ username || "Customer" }}
+            </a>
+            <ul
+              class="dropdown-menu dropdown-menu-end"
+              aria-labelledby="navbarDropdown"
+            >
+              <li>
+                <a class="dropdown-item" routerLink="/home/profile">Profile</a>
+              </li>
+              <li><hr class="dropdown-divider" /></li>
+              <li>
+                <button class="dropdown-item" (click)="logout()">Logout</button>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 🔍 Search Results Dropdown -->
+  <div *ngIf="searchResults.length > 0" class="container mt-2">
+    <div class="card p-3 shadow-sm">
+      <h6>Search Results</h6>
+      <ul class="list-group">
+        <li
+          class="list-group-item"
+          *ngFor="let product of searchResults"
+          (click)="goToProduct(product.id)"
+          style="cursor: pointer"
+        >
+          {{ product.name }} - ₹{{ product.price }}
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="container my-4 flex-grow-1">
+    <router-outlet></router-outlet>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-dark text-white text-center p-4 mt-auto">
+    <p class="mb-0">&copy; 2025 shopsmart. All rights reserved.</p>
+    <p class="mb-0">
+      <a href="#" class="text-white-50">Privacy Policy</a> |
+      <a href="#" class="text-white-50">Terms of Service</a>
+    </p>
+  </footer>
+</div>

@@ -1,0 +1,132 @@
+<div class="admin-dashboard-container container my-5">
+  <h2 class="text-center mb-3 dashboard-title" style="color: rgba(55, 11, 11, 0.55);">Admin Dashboard</h2>
+  <p class="text-center text-muted mb-5 lead-text">Welcome to your control panel. Manage your e-commerce platform efficiently.</p>
+
+  <!-- Quick Stats Section (NEW) -->
+  <div class="quick-stats-section mb-5">
+    <h4 class="text-center mb-4 section-heading">Quick Overview</h4>
+    <div class="row g-4 justify-content-center">
+      <div class="col-md-6 col-lg-3">
+        <div class="stat-card card h-100 shadow-sm rounded-3 text-center">
+          <div class="card-body p-4">
+            <i data-lucide="shopping-bag" class="stat-icon text-info mb-3"></i>
+            <h6 class="card-subtitle text-muted mb-2">Total Products</h6>
+            <h4 class="card-title fw-bold text-info">2,500+</h4> <!-- Placeholder data -->
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="stat-card card h-100 shadow-sm rounded-3 text-center">
+          <div class="card-body p-4">
+            <i data-lucide="users" class="stat-icon text-success mb-3"></i>
+            <h6 class="card-subtitle text-muted mb-2">Active Customers</h6>
+            <h4 class="card-title fw-bold text-success">1,200+</h4> <!-- Placeholder data -->
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="stat-card card h-100 shadow-sm rounded-3 text-center">
+          <div class="card-body p-4">
+            <i data-lucide="clipboard-list" class="stat-icon text-warning mb-3"></i>
+            <h6 class="card-subtitle text-muted mb-2">Pending Orders</h6>
+            <h4 class="card-title fw-bold text-warning">15</h4> <!-- Placeholder data -->
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="stat-card card h-100 shadow-sm rounded-3 text-center">
+          <div class="card-body p-4">
+            <i data-lucide="dollar-sign" class="stat-icon text-primary mb-3"></i>
+            <h6 class="card-subtitle text-muted mb-2">Revenue (Month)</h6>
+            <h4 class="card-title fw-bold text-primary">₹50,000+</h4> <!-- Placeholder data -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Management Actions Section -->
+  <h4 class="text-center mb-4 section-heading">Management Actions</h4>
+  <div class="row g-4">
+    <!-- Product Management Card -->
+    <div class="col-md-6 col-lg-4">
+      <div class="dashboard-card card h-100 shadow-lg border-0">
+        <div class="card-body d-flex flex-column align-items-center justify-content-center p-4">
+          <i data-lucide="package" class="icon-large text-primary mb-3"></i>
+          <h5 class="card-title fw-bold mb-2">Manage Products</h5>
+          <p class="card-text text-muted text-center mb-4">Add, edit, or remove products from your inventory.</p>
+          <button class="btn btn-primary w-100 py-2" routerLink="/admin/products">
+            <i data-lucide="eye" class="me-2 icon-small"></i>View Products
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Customer Management Card -->
+    <div class="col-md-6 col-lg-4">
+      <div class="dashboard-card card h-100 shadow-lg border-0">
+        <div class="card-body d-flex flex-column align-items-center justify-content-center p-4">
+          <i data-lucide="users" class="icon-large text-success mb-3"></i>
+          <h5 class="card-title fw-bold mb-2">Manage Customers</h5>
+          <p class="card-text text-muted text-center mb-4">View and manage customer accounts and profiles.</p>
+          <button class="btn btn-success w-100 py-2" routerLink="/admin/customers">
+            <i data-lucide="user" class="me-2 icon-small"></i>View Customers
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Order Management Card -->
+    <div class="col-md-6 col-lg-4">
+      <div class="dashboard-card card h-100 shadow-lg border-0">
+        <div class="card-body d-flex flex-column align-items-center justify-content-center p-4">
+          <i data-lucide="shopping-cart" class="icon-large text-info mb-3"></i>
+          <h5 class="card-title fw-bold mb-2">Manage Orders</h5>
+          <p class="card-text text-muted text-center mb-4">Process orders, update statuses, and view order history.</p>
+          <button class="btn btn-info w-100 py-2" routerLink="/admin/orders">
+            <i data-lucide="clipboard-list" class="me-2 icon-small"></i>View Orders
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Category Management Card -->
+    <div class="col-md-6 col-lg-4">
+      <div class="dashboard-card card h-100 shadow-lg border-0">
+        <div class="card-body d-flex flex-column align-items-center justify-content-center p-4">
+          <i data-lucide="tag" class="icon-large text-warning mb-3"></i>
+          <h5 class="card-title fw-bold mb-2">Manage Categories</h5>
+          <p class="card-text text-muted text-center mb-4">Add, edit, and organize product categories.</p>
+          <button class="btn btn-warning w-100 py-2" routerLink="/admin/categories">
+            <i data-lucide="tags" class="me-2 icon-small"></i>View Categories
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Discounts Management -->
+     <div class="col-md-6 col-lg-4">
+      <div class="dashboard-card card h-100 shadow-lg border-0">
+        <div class="card-body d-flex flex-column align-items-center justify-content-center p-4">
+          <i data-lucide="tag" class="icon-large text-warning mb-3"></i>
+          <h5 class="card-title fw-bold mb-2">Manage Discount Coupons</h5>
+          <p class="card-text text-muted text-center mb-4">Add, edit Discount Coupons.</p>
+          <button class="btn btn-success w-100 py-2" routerLink="/admin/discounts">
+            <i data-lucide="tags" class="me-2 icon-small"></i>View Discount Coupons
+          </button>
+        </div>
+      </div>
+    </div>
+
+
+
+  </div>
+</div>
+
+<script>
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+  } else {
+    console.warn('Lucide icons script not loaded. Icons may not render.');
+  }
+</script>

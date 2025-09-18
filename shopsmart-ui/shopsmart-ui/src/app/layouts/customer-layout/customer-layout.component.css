@@ -1,0 +1,116 @@
+
+html, body {
+  height: 100%;
+}
+.d-flex.flex-column.min-vh-100 {
+  min-height: 100vh;
+  background-color: #C0C0C0;
+}
+
+/* Button Base Style */
+.btn {
+  font-size: 16px;
+  font-weight: 600;
+  padding: 10px 22px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+/* Login Button (Outline) */
+.btn-outline-burgundy {
+  color: #4A0E1C;
+  border: 2px solid #4A0E1C;
+  background-color: transparent;
+}
+
+.btn-outline-burgundy:hover {
+  background-color: #4A0E1C;
+  color: #fff;
+}
+
+/* Signup Button (Solid) */
+.btn-burgundy {
+  background-color: #4A0E1C;
+  color: #fff;
+  border: 2px solid #4A0E1C;
+}
+
+.btn-burgundy:hover {
+  background-color: #721C2E; /* Slightly darker shade for hover */
+  border-color: #721C2E;
+}
+
+
+/* header {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0,0,0,0.5)), url('https://placehold.co/1200x600/007bff/ffffff?text=shopsmart shopping+Banner'); 
+  background-size: cover;
+  background-position: center;
+} */
+
+header {
+  background-image: linear-gradient(
+      rgba(74, 14, 31, 0.9),   /* Deep Burgundy overlay */
+      rgba(74, 14, 31, 0.9)
+    ),
+    url('https://placehold.co/1200x600/4A0E1F/F8D7DA?text=ShopSmart+Shopping');
+  background-size: cover;
+  background-position: center;
+  color: #F8D7DA; /* Blush Accent */
+  text-align: center;
+  padding: 80px 20px;
+  font-family: 'Playfair Display', serif;
+}
+
+header h1 {
+  font-size: 3rem;
+  color: #FFD700; /* Gold Highlight */
+  margin-bottom: 20px;
+}
+
+header p {
+  font-size: 1.2rem;
+  color: #F8D7DA; /* Blush Text */
+}
+
+/* Optional Button */
+header .btn {
+  background-color: #FFD700; /* Gold Button */
+  color: #4A0E1F; /* Burgundy Text */
+  padding: 12px 30px;
+  border-radius: 30px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  text-decoration: none;
+  transition: all 0.3s ease-in-out;
+}
+
+header .btn:hover {
+  background-color: #F8D7DA; /* Blush Hover */
+  color: #4A0E1F;
+}
+
+
+.card-img-top {
+  border-bottom: 1px solid #eee;
+}
+
+
+
+.card-title {
+  margin-bottom: 0.5rem;
+  font-size: 1.25rem;
+}
+
+.card-text {
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.spinner-border {
+  vertical-align: middle;
+  margin-right: 8px;
+}
+
+/*button styles*/
+

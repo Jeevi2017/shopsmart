@@ -1,0 +1,44 @@
+<div class="container mt-4">
+  <div class="card shadow-sm rounded-3">
+    <div class="card-header bg-dark text-white py-3">
+      <h3 class="mb-0">Bulk Upload Products (CSV)</h3>
+    </div>
+    <div class="card-body p-4">
+
+      <!-- Error Message Display -->
+      <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{ errorMessage }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" (click)="errorMessage = null"></button>
+      </div>
+
+      <!-- Success Message Display -->
+      <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ successMessage }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" (click)="successMessage = null"></button>
+      </div>
+
+      <div class="mb-4">
+        <label for="csvFile" class="form-label">Select CSV File:</label>
+        <input type="file" id="csvFile" class="form-control" (change)="onFileSelected($event)" accept=".csv" />
+        <div class="form-text mt-2">
+          Upload a CSV file containing product data. The file should have columns:
+          <code>name,description,price,categoryId,stockQuantity,images</code>.
+          <br>
+          Example Category IDs: {{ categoryNames }}.
+          <br>
+          Images should be comma-separated URLs (optional).
+        </div>
+      </div>
+
+      <button class="btn btn-primary w-100 py-2" (click)="onUpload()" [disabled]="!selectedFile || loading">
+        <span *ngIf="loading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+        {{ loading ? 'Uploading...' : 'Upload CSV' }}
+      </button>
+
+      <div class="mt-4 text-center">
+        <a routerLink="/admin/products" class="btn btn-outline-secondary">Back to Product List</a>
+      </div>
+
+    </div>
+  </div>
+</div>
