@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -11,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import com.google.zxing.WriterException;
 import com.shopsmart.config.SecurityConstants;
 import com.shopsmart.dto.OrderDTO;
 import com.shopsmart.dto.PaymentDTO;
@@ -23,6 +25,9 @@ import com.shopsmart.service.CustomerService;
 import com.shopsmart.service.OrderService;
 import com.shopsmart.service.PaymentService;
 import com.shopsmart.service.UserService;
+import com.shopsmart.service.QRCodeGeneratorService; // ⚠️ Import the new service
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/payments")
@@ -40,6 +45,9 @@ public class PaymentController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private QRCodeGeneratorService qrCodeGeneratorService; // ⚠️ Autowire the new service
 
     // 🔹 Get currently authenticated user
     private Long getAuthenticatedUserId() {
@@ -86,6 +94,39 @@ public class PaymentController {
         return new ResponseEntity<>(savedPayment, HttpStatus.CREATED);
     }
 
+    // ⚠️ New endpoint to generate a QR code for an order
+    @GetMapping("/generate-qr/{orderId}")
+    @PreAuthorize("hasAnyAuthority('" + SecurityConstants.ROLE_ADMIN + "', '" + SecurityConstants.ROLE_CUSTOMER + "')")
+    public ResponseEntity<byte[]> generateQrCodeForOrder(@PathVariable Long orderId) {
+        try {
+            validateOrderOwnership(orderId);
+            OrderDTO orderDTO = orderService.getOrderById(orderId);
+            
+            // Construct the QR code content. This can be a URL, a payment link, or any data a QR scanner app can understand.
+            // For a payment, this would typically be a string that links to a payment page or a payment app's deep link.
+            // Example: A URL to the payment page for this order, or a UPI QR code string.
+            // Here, we'll use a simple text string for demonstration.
+            String paymentData = "Order ID: " + orderDTO.getId() + "\n"
+                               + "Total Amount: $" + orderDTO.getTotalAmount() + "\n"
+                               + "Customer ID: " + orderDTO.getCustomerId();
+
+            // Generate the QR code image as a byte array
+            byte[] qrCode = qrCodeGeneratorService.generatePaymentQrCode(paymentData, 300, 300);
+
+            // Return the image with the appropriate content type
+            return ResponseEntity.ok()
+                    .contentType(MediaType.IMAGE_PNG)
+                    .body(qrCode);
+        } catch (ResourceNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (SecurityException e) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        } catch (WriterException | IOException e) {
+            System.err.println("Error generating QR code: " + e.getMessage());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    
     // Create Razorpay order (for initiating online payment)
     @PostMapping("/razorpay/order")
     @PreAuthorize("hasAnyAuthority('" + SecurityConstants.ROLE_ADMIN + "', '" + SecurityConstants.ROLE_CUSTOMER + "')")
