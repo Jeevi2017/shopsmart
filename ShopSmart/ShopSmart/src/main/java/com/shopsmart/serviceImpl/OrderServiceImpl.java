@@ -12,9 +12,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.element.Table;
+import com.itextpdf.layout.property.TextAlignment;
+import com.itextpdf.layout.property.UnitValue;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -205,6 +220,66 @@ public class OrderServiceImpl implements OrderService {
     public List<OrderDTO> getAllOrders() {
         return orderRepository.findAll().stream().map(this::mapOrderToDTO).collect(Collectors.toList());
     }
+    
+    @Override
+    public byte[] generateOrderReportPdf(Long orderId) throws IOException {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order", "id", orderId));
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PdfWriter writer = new PdfWriter(baos);
+        PdfDocument pdf = new PdfDocument(writer);
+        Document document = new Document(pdf);
+
+        // Add a title
+        document.add(new Paragraph("Order Summary Report")
+                .setFontSize(24)
+                .setTextAlignment(TextAlignment.CENTER));
+
+        // Add order details
+        document.add(new Paragraph("Order ID: " + order.getId()));
+        document.add(new Paragraph("Order Date: " + order.getOrderDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))));
+        document.add(new Paragraph("Customer ID: " + order.getCustomer().getId()));
+        document.add(new Paragraph("Status: " + order.getStatus()));
+        document.add(new Paragraph("Shipping Address: " + order.getShippingAddress()));
+        
+        // Add a section for order items
+        document.add(new Paragraph("Order Items").setFontSize(18));
+
+        // Create a table for the order items
+        Table table = new Table(UnitValue.createPercentArray(new float[]{40, 20, 20, 20}));
+        table.setWidth(UnitValue.createPercentValue(100));
+        table.addHeaderCell("Product Name");
+        table.addHeaderCell("Quantity");
+        table.addHeaderCell("Price");
+        table.addHeaderCell("Total");
+
+        for (OrderItem item : order.getOrderItems()) {
+            table.addCell(item.getProduct().getName());
+            table.addCell(String.valueOf(item.getQuantity()));
+            table.addCell(String.format("Rs.%.2f", item.getPrice()));
+            table.addCell(String.format("Rs.%.2f", BigDecimal.valueOf(item.getQuantity()).multiply(item.getPrice())));
+        }
+        document.add(table);
+        
+        // Add summary at the end
+        document.add(new Paragraph("Subtotal: Rs." + getOrderSubtotal(order).toPlainString())
+                .setTextAlignment(TextAlignment.RIGHT));
+
+        if (order.getDiscountAmount() != null && order.getDiscountAmount().compareTo(BigDecimal.ZERO) > 0) {
+            document.add(new Paragraph("Discount (" + order.getCouponCode() + "): -Rs." + order.getDiscountAmount().toPlainString())
+                    .setTextAlignment(TextAlignment.RIGHT));
+        }
+
+        document.add(new Paragraph("Total Amount: Rs." + order.getTotalAmount().toPlainString())
+                .setFontSize(16)
+                .setTextAlignment(TextAlignment.RIGHT));
+        
+        document.close();
+        
+        // Return the byte array directly
+        return baos.toByteArray();
+    }
 
     private OrderDTO mapOrderToDTO(Order order) {
         OrderDTO orderDTO = new OrderDTO();
@@ -260,5 +335,11 @@ public class OrderServiceImpl implements OrderService {
                 address.getState(),
                 address.getPostalCode(),
                 address.getCountry());
+    }
+
+    private BigDecimal getOrderSubtotal(Order order) {
+        return order.getOrderItems().stream()
+                .map(item -> item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

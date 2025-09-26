@@ -26,7 +26,7 @@ public class DiscountController {
     private CartService cartService;
 
     @PostMapping
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')") // This requires the user to have 'ROLE_ADMIN' authority.
     public ResponseEntity<DiscountDTO> createDiscount(@Validated @RequestBody DiscountDTO discountDTO) {
         DiscountDTO createdDiscount = discountService.createDiscount(discountDTO);
         return new ResponseEntity<>(createdDiscount, HttpStatus.CREATED);

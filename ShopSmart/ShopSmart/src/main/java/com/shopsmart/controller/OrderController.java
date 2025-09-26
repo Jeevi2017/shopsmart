@@ -1,11 +1,14 @@
 package com.shopsmart.controller;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -72,21 +75,12 @@ public class OrderController {
 
     /**
      * Get order by ID (Admin or Order Owner)
+     * FIX: The ownership check is now handled directly by the @PreAuthorize annotation,
+     * which is a cleaner and more secure approach. The redundant manual check has been removed.
      */
     @GetMapping("/{orderId}")
-    @PreAuthorize("hasAuthority('" + SecurityConstants.ROLE_ADMIN + "') or hasAuthority('" + SecurityConstants.ROLE_CUSTOMER + "')")
+    @PreAuthorize("hasAuthority('" + SecurityConstants.ROLE_ADMIN + "') or (@orderController.getAuthenticatedCustomerId() == @orderController.getCustomerIdByOrderId(#orderId))")
     public ResponseEntity<OrderDTO> getOrderById(@PathVariable Long orderId) {
-        Long authenticatedCustomerId = getAuthenticatedCustomerId();
-        Long orderCustomerId = getCustomerIdByOrderId(orderId);
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean isAdmin = authentication.getAuthorities().stream()
-                .anyMatch(auth -> auth.getAuthority().equals(SecurityConstants.ROLE_ADMIN));
-
-        if (!isAdmin && !authenticatedCustomerId.equals(orderCustomerId)) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-
         return ResponseEntity.ok(orderService.getOrderById(orderId));
     }
 
@@ -151,8 +145,32 @@ public class OrderController {
     @PutMapping("/{orderId}")
     @PreAuthorize("hasAuthority('" + SecurityConstants.ROLE_ADMIN + "')")
     public ResponseEntity<OrderDTO> updateOrderStatus(
-            @PathVariable Long orderId,
-            @Validated @RequestBody String status) {
+                @PathVariable Long orderId,
+                @Validated @RequestBody String status) {
         return ResponseEntity.ok(orderService.updateOrderStatus(orderId, status));
+    }
+
+    /**
+     * Generate PDF for a specific order by ID (Admin or Order Owner)
+     * FIX: The @PreAuthorize expression is now correctly updated to include
+     * an ownership check for customers, preventing a security vulnerability.
+     */
+    @PreAuthorize("hasAuthority('" + SecurityConstants.ROLE_ADMIN + "') or (@orderController.getAuthenticatedCustomerId() == @orderController.getCustomerIdByOrderId(#orderId))")
+    @GetMapping("/{orderId}/report/pdf")
+    public ResponseEntity<byte[]> generateOrderReportPdf(@PathVariable Long orderId) {
+        try {
+            byte[] pdfBytes = orderService.generateOrderReportPdf(orderId);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("attachment", "order_report_" + orderId + ".pdf");
+            headers.setContentLength(pdfBytes.length);
+
+            return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+        } catch (Exception e) {
+            // Log the exception details for debugging
+            e.printStackTrace();
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

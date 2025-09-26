@@ -8,7 +8,7 @@
 }
 
 .card-header {
-  background-color: #007bff; 
+  background-color: #007bff;
   color: white;
   border-bottom: none;
 }
@@ -29,4 +29,13 @@
 
 .alert {
   border-radius: 0.5rem;
+}
+
+/* NEW: QR Code styling */
+.qr-code-img {
+  width: 220px;
+  height: 220px;
+  border: 8px solid #f8f9fa;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
