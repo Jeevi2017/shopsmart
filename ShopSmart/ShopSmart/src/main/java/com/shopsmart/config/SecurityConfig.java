@@ -77,7 +77,7 @@ public class SecurityConfig {
     public RoleHierarchy roleHierarchy() {
         RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
         String hierarchy = SecurityConstants.ROLE_SUPER_ADMIN + " > " + SecurityConstants.ROLE_ADMIN + "\n" +
-                               SecurityConstants.ROLE_ADMIN + " > " + SecurityConstants.ROLE_CUSTOMER;
+                                SecurityConstants.ROLE_ADMIN + " > " + SecurityConstants.ROLE_CUSTOMER;
         roleHierarchy.setHierarchy(hierarchy);
         return roleHierarchy;
     }
@@ -94,8 +94,8 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable).cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        // NEW: Temporarily allow POST requests to the order endpoint for testing
-                        .requestMatchers(HttpMethod.POST, "/api/orders/from-cart/**").permitAll()
+                        // REMOVED: The temporary .permitAll() was removed to properly secure the order creation endpoint.
+                        // The @PreAuthorize annotation on the controller method will now correctly handle authorization.
                         .requestMatchers("/api/auth/register", "/api/auth/login", "/api/auth/refresh-token",
                                 "/api/auth/register-admin", "/api/auth/verify-2fa")
                         .permitAll().requestMatchers("/api/customers/register").permitAll()

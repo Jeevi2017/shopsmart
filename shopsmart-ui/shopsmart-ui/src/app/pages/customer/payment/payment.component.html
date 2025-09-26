@@ -37,19 +37,19 @@
             *ngFor="let item of order.orderItems"
           >
             <div>
-              <span class="fw-bold">{{ item.productDetails.name }}</span> <!-- Added safe navigation -->
+              <span class="fw-bold">{{ item.productDetails.name }}</span>
               <span class="text-muted ms-2">x {{ item.quantity }}</span>
             </div>
             <span>Rs.{{ item.quantity * item.price | number : "1.2-2" }}</span>
           </li>
           
-          <!-- NEW: Subtotal before discount -->
+          <!-- Subtotal -->
           <li class="list-group-item d-flex justify-content-between align-items-center">
             <span>Subtotal:</span>
             <span>Rs.{{ getOrderSubtotal() | number : "1.2-2" }}</span>
           </li>
 
-          <!-- NEW: Discount details -->
+          <!-- Discount -->
           <li
             *ngIf="order.discountAmount && order.discountAmount > 0"
             class="list-group-item d-flex justify-content-between align-items-center text-success"
@@ -58,13 +58,12 @@
             <span>-Rs.{{ order.discountAmount | number : "1.2-2" }}</span>
           </li>
 
+          <!-- Total Amount -->
           <li
             class="list-group-item d-flex justify-content-between align-items-center bg-light fw-bold"
           >
             <span>Total Amount:</span>
-            <span class="fs-5 text-success"
-              >Rs.{{ order.totalAmount | number : "1.2-2" }}</span
-            >
+            <span class="fs-5 text-success">Rs.{{ order.totalAmount | number : "1.2-2" }}</span>
           </li>
         </ul>
 
@@ -83,6 +82,33 @@
               Razorpay (Credit Card / Debit Card / UPI / Netbanking)
             </label>
           </div>
+
+          <!-- QR Payment Option -->
+          <div class="form-check mt-2">
+            <input
+              class="form-check-input"
+              type="radio"
+              name="paymentMethod"
+              id="qrcode"
+              value="QRCODE"
+              [(ngModel)]="selectedPaymentMethod"
+              (change)="generateQRCode()"
+            />
+            <label class="form-check-label" for="qrcode">
+              Pay via QR Code (UPI / Wallet)
+            </label>
+          </div>
+        </div>
+
+        <!-- QR Code Display -->
+        <div *ngIf="selectedPaymentMethod === 'QRCODE'" class="text-center mb-4">
+          <h5 class="mb-3">Scan this QR to Pay</h5>
+          <img
+            *ngIf="qrCodeUrl"
+            [src]="qrCodeUrl"
+            alt="QR Code"
+            class="qr-code-img"
+          />
         </div>
 
         <!-- Payment success/error messages -->
@@ -142,7 +168,7 @@
         <h4 class="alert-heading">No order found for payment.</h4>
         <p>Please ensure you have an active order to proceed with payment.</p>
         <hr />
-        <a routerLink="/home/cart" class="btn btn-primary">Go to Cart</a> <!-- Changed from /home/cart -->
+        <a routerLink="/home/cart" class="btn btn-primary">Go to Cart</a>
       </div>
     </div>
   </div>

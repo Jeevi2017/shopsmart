@@ -70,8 +70,9 @@ export class PaymentService {
     receipt: string
   ): Observable<RazorpayOrderResponseDTO> {
     const headers = this.getAuthHeaders();
+    // This is the corrected line using your preferred syntax
     const requestBody: RazorpayOrderRequestDTO = {
-      orderId: orderId, // Use the correct field name from RazorpayOrderRequestDTO
+      orderId: orderId,
       amount,
       currency,
       receipt
@@ -101,16 +102,12 @@ export class PaymentService {
 
   /**
    * Fetches a QR code image for a specific order.
-   * This is the core business logic for QR code generation.
    * @param orderId The ID of the order for which to generate the QR code.
    * @returns An observable of the QR code image as a binary ArrayBuffer.
    */
   getQrCode(orderId: number): Observable<ArrayBuffer> {
-    // The Content-Type is not 'application/json' for this request, as we're not sending JSON.
-    const headers = this.getAuthHeaders('image/png').set('Accept', 'image/png');
+    const headers = this.getAuthHeaders().set('Accept', 'image/png').delete('Content-Type');
     
-    // Make an HTTP GET request to the Spring Boot endpoint.
-    // The responseType is set to 'arraybuffer' to handle the binary image data.
     return this.http.get(`${this.baseUrl}/generate-qr/${orderId}`, {
       headers,
       responseType: 'arraybuffer'
@@ -151,4 +148,6 @@ export class PaymentService {
       headers,
     });
   }
+
+  
 }

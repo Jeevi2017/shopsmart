@@ -1,12 +1,13 @@
 package com.shopsmart.service;
 
+import java.io.IOException;
 import java.util.List;
 
 import com.shopsmart.dto.OrderDTO;
+import com.shopsmart.dto.ShareableLinkResponse;
 
 public interface OrderService {
-
-   
+    
     OrderDTO placeOrder(Long customerId); 
 
     List<OrderDTO> getAllOrders();
@@ -23,4 +24,7 @@ public interface OrderService {
     void cancelOrder(Long orderId);
 
     OrderDTO createOrderFromCart(Long customerId);
+    
+    // Updated method to return PDF bytes directly, with a corrected name.
+    byte[] generateOrderReportPdf(Long orderId) throws IOException;
 }
